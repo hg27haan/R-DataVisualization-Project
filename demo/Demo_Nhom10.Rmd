@@ -1,0 +1,209 @@
+---
+title: "Demo"
+author: "Nhóm 10"
+date: "2023-09-19"
+output:
+  prettydoc::html_pretty:
+    theme: tactile
+    highlight: github
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(readr)
+library(ggplot2)
+library(tidyverse)
+library(hexbin) #Thư viện chứa các hàm để tạo biểu đồ hexa bin.
+library(RColorBrewer) #Thư viện chứa các hàm để tạo biểu đồ hexa bin.
+library(reshape2)
+library(dplyr)
+library(GGally)
+```
+### Pie Chart, Bubble Chart và Hexbin plots sử dụng một tập dữ liệu được tải về. Tên của tập dữ liệu đó là "Spotify-2023"
+### Bộ dữ liệu này chứa một danh sách toàn diện các bài hát nổi tiếng nhất năm 2023 như được liệt kê trên Spotify. 
+
+### Tiến hành nạp dữ liệu vào
+
+```{r}
+data <- read.csv("./spotify-2023.csv")
+```
+
+### Tiến hành mô tả dữ liệu
+
+```{r,echo=FALSE}
+summary(data)
+```
+
+### In ra 2 dòng dữ liệu đầu tiên
+```{r,echo=FALSE}
+head(data,2)
+```
+
+### Lấy dữ liệu cần dùng
+
+```{r, echo=FALSE}
+dt <- data[1:5, 1:24]
+head(dt)
+```
+
+### Data visulization thuộc loại Pie Chart
+
+```{r, echo=FALSE}
+pie(dt$in_spotify_charts,labels =dt$artist.s._name)
+```
+
+### Bubble chart
+
+### Lấy dữ liệu cần dùng
+
+```{r}
+dtbb <- data
+head(dtbb,3)
+```
+
+```{r}
+ggplot(dtbb,aes(x=in_spotify_charts, y=in_apple_charts,size=energy_.,color=energy_.))+ geom_point(alpha=0.5) + labs(title = "Bubble Chart")
+```
+
+### hexbin plots
+
+```{r}
+
+ggplot(dtbb,aes(x=danceability_., y=energy_.))+ geom_hex(bins=20) 
+
+```
+
+
+```{r}
+# Đọc dữ liệu từ tệp CSV
+df<-read.csv("stackedvd1.csv",header=TRUE)
+# Chuyển đổi dữ liệu từ dạng wide sang long để phù hợp với ggplot2
+data_long <- melt(df, id.vars = "Tuổi")
+data_long$Tuổi <- factor(data_long$Tuổi, levels = c(
+  "0>4", "5>9", "10>14", "15>19", "20>24", "25>29", "30>34",
+  "35>39", "40>44", "45>49", "50>54", "55>59", "60>64", "65>69",
+  "70>74", "75>79", "80>84", "85+"
+))
+# Vẽ biểu đồ stacked bar chart
+ggplot(data_long, aes(x = value, y = Tuổi, fill = variable)) +
+  geom_bar(stat = "identity") +
+  labs(
+    title = "Biểu đồ Thống kê dân số theo độ tuổi",
+    x = "Số dân",
+    y = "Đọ tuổi",
+    fill = "Nam/Nữ"
+  )
+  
+```
+
+
+```{r}
+df<-read.csv("insurance.csv",header=TRUE)
+# Vẽ biểu đồ scatter plot
+ggplot(df, aes(x = age, y = charges,color=smoker,shape=sex,size=region)) +
+  geom_point() +  # Vẽ điểm
+  labs(x = "bmi", y = "charges") +  
+  ggtitle("Biều đồ thể hiện sự tương quan giữa chỉ số BMI và chi phí y tế")+
+  scale_color_manual(values = c("yes" = "red", "no" = "blue"))+
+  scale_shape_manual(values = c("male"=8,"female"=0))
+  
+```
+```{r}
+# Đọc dữ liệu từ tệp CSV
+df<-read.csv("areachartvd2.csv",header=TRUE)
+
+
+# Vẽ biểu đồ diện tích
+ggplot(df, aes(x = df$Year)) +
+  geom_area(aes(y = Liquidfuel, group = 1, fill = "Liquid fuel"), alpha = 0.5) +
+  geom_area(aes(y = Solidfuel, group = 1, fill = "Solid fuel"), alpha = 0.5) +
+  geom_area(aes(y = Gasfuel, group = 1, fill = "Gas fuel"), alpha = 0.5) +
+  geom_area(aes(y = Cementproduction, group = 1, fill = "Cement production"), alpha = 0.5) +
+  geom_area(aes(y = Gasflaring, group = 1, fill = "Gas flaring"), alpha = 0.5) +
+  labs(
+    title = "Biểu đồ diện tích nhiệt độ theo tháng",
+    x = "Năm",
+    y = "Đơn vị",
+    fill = "Nhiên liệu"
+  ) +
+  scale_fill_manual(values = c("Liquid fuel" = "blue", "Solid fuel" = "red", "Gas fuel" = "green", "Cement production" = "purple", "Gas flaring" ='violet')) +
+  theme_minimal()
+```
+```{R}
+data <- read.csv("population_en_v2.csv")
+head(data)
+data_summarized <- data %>%
+  group_by(Year) %>%
+  summarise(TotalPopulation = sum(Average.population))
+data_summarized
+
+ggplot(data_summarized,aes(x = Year,y=TotalPopulation,fill =Year )) +
+    geom_bar(stat = "identity", aes(fill=Year)) +
+    geom_text(aes(label = TotalPopulation), vjust = -0.5, size = 3,position = position_dodge(width = 1)) +
+    labs(title = "Biểu đồ cộng dân số qua các năm (nghìn người)", x = "Năm", y = "Dân số tổng cộng (nghìn)")
+    
+
+```
+
+
+
+```{r}
+data <- read.csv("BestSeller.csv")
+head(data)
+ggplot(data,aes(x=genre,y=ratings,fill=genre))+
+  geom_boxplot(notch = T, notchwidth = 0.5,outlier.colour="red")
+
+```
+
+
+
+```{r}
+head(iris)
+ggpairs(iris,                 
+        columns = 1:4,        
+        aes(color = Species,  
+            alpha = 0.5))
+
+```
+
+
+## Histogram
+### Sử dụng một tập dữ liệu có sẵn trong R. Tên của tập dữ liệu đó là: BJsales.lead (Sales Data with Leading Indicator)
+#### Đưa dữ liệu vào trong bộ nhớ.
+```{r BJsales.lead,warning=FALSE, message = FALSE}
+data(BJsales)
+```
+
+#### In ra thông tin tóm tắt của dữ liệu
+```{r,echo=FALSE}
+summary(BJsales.lead)
+```
+
+#### In ra dữ liệu của bảng dữ liệu
+```{r,echo=FALSE}
+BJsales.lead
+```
+### Data visulization thuộc loại histogram
+```{r, echo=FALSE,warning=FALSE, message = FALSE}
+df <- data.frame(BJsales.lead)
+ggplot(df,aes(x=BJsales.lead))+geom_histogram(color="black",fill="red")
+```
+
+
+
+## KDE
+### Sử dụng một tập dữ liệu có sẵn trong R. Tên của tập dữ liệu đó là: BJsales.lead (Sales Data with Leading Indicator)
+
+#### In ra thông tin tóm tắt của dữ liệu
+```{r,echo=FALSE}
+summary(BJsales.lead)
+```
+
+#### In ra dữ liệu của bảng dữ liệu
+```{r,echo=FALSE}
+BJsales.lead
+```
+### Data visulization thuộc loại histogram
+```{r, echo=FALSE,warning=FALSE, message = FALSE}
+df <- data.frame(BJsales.lead)
+ggplot(df,aes(x=BJsales.lead))+geom_density(color="black",fill="blue",linetype="dashed", size=2)
